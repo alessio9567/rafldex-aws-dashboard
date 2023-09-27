@@ -1,11 +1,6 @@
+import json
 import utils
 import boto3
-import os
-
-# Set the AWS profile name to use (replace with your profile name)
-os.environ['AWS_PROFILE'] = 'aiannini-minsait'
-
-ETHERSCAN_API_TOKEN = "FXDQ4IE84V61CDDSVYBMMRHQG4YY3EFH6V"
 
 # Initialize S3 client
 s3 = boto3.client('s3')
@@ -21,20 +16,21 @@ start_block = 0
 
 rafldex_smart_contract_addresses = utils.get_contracts_addresses_created_by_account(account_address, start_block)
 
-# Array of array of json
-rafldex_new_transactions = []
-
 for contract in rafldex_smart_contract_addresses:
-    # Specify the JSON file name
-    json_file_name = f"{contract}_{start_block}"
+    if utils.is_valid_contract_address(contract):
+        # Specify the JSON file name
+        json_file_name = f"{contract}_{start_block}"
 
-    # Upload the JSON data as a JSON file to S3
-    s3.put_object(
-        Bucket=bucket_name,
-        Key=json_file_name,
-        Body=utils.get_transactions(contract,start_block),  # The JSON data string
-        ContentType='application/json'  # Set the content type as JSON
-    )
+        # Upload the JSON data as a JSON file to S3
+        s3.put_object(
+            Bucket=bucket_name,
+            Key=json_file_name,
+            Body=json.dumps(utils.get_transactions(contract,start_block)),  # The JSON data string
+            ContentType='application/json'  # Set the content type as JSON
+        )
+
+        print(f"{json_file_name} Uploaded to S3")
+
 
     #rafldex_new_transactions.append(utils.get_transactions(contract,start_block))
 

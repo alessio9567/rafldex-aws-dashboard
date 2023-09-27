@@ -6,6 +6,12 @@ api_key = 'FXDQ4IE84V61CDDSVYBMMRHQG4YY3EFH6V'
 # Etherscan API base URL
 base_url = 'https://api.etherscan.io/api'
 
+def is_valid_contract_address(address):
+    if len(address) == 42:
+        return True
+    else:
+        return False
+
 
 # Function to get the list of transactions for the account
 def get_transactions(address, start_block):
